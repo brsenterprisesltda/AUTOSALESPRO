@@ -3,123 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Motor de Avaliação Auto-Flipper</title>
+    <title>Autosales Pro - Calculadora & Inspeção</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: #f4f4f9; color: #333; padding: 20px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding: 20px; }
+        .container { max-width: 500px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
         
-        /* Ecrã de Login */
-        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f4f4f9; display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .login-box { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; width: 90%; max-width: 350px; }
-        .login-box h2 { margin-bottom: 10px; font-size: 1.4rem; }
-        .login-box p { color: #666; margin-bottom: 20px; font-size: 0.9rem; }
-        .login-box button { width: 100%; padding: 12px; background: #2e7d32; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .login-box button:hover { background: #1b5e20; }
-        #loginError { color: #c62828; font-size: 0.85rem; display: none; margin-top: 15px; font-weight: bold; }
+        /* Estilos do Login */
+        #login-screen { text-align: center; padding-top: 50px; }
+        #login-screen input { width: 100%; max-width: 300px; padding: 12px; margin: 10px 0; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; text-align: center; }
+        #login-screen button { background-color: #003355; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; max-width: 325px; }
+        #error-msg { color: #ef4444; margin-top: 10px; display: none; font-size: 14px; }
 
-        /* Calculadora Principal */
-        .app-container { max-width: 500px; margin: 0 auto; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 24px; display: none; /* Escondido por defeito */ }
-        header h1 { font-size: 1.5rem; color: #1a1a1a; margin-bottom: 5px; }
-        header p { font-size: 0.9rem; color: #666; margin-bottom: 25px; }
-        h2 { font-size: 1.1rem; margin-bottom: 15px; color: #444; }
-        label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: #555; }
-        input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem; background-color: #fafffa; transition: border-color 0.2s; }
-        input:focus { border-color: #2e7d32; outline: none; }
-        .output-section { margin-top: 25px; padding-top: 20px; border-top: 2px dashed #eee; }
-        .result-card { background-color: #f0f0f0; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .result-card.danger { background-color: #ffebee; border: 1px solid #ffcdd2; }
-        .result-card.danger .result-value { color: #c62828; }
-        .result-label { font-weight: 600; font-size: 0.9rem; }
-        .result-value { font-size: 1.25rem; font-weight: bold; color: #2e7d32; }
+        /* Estilos da Calculadora */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 14px; color: #475569; }
+        input[type="number"] { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 16px; box-sizing: border-box; }
+        button.calc-btn { background-color: #10B981; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: 800; width: 100%; cursor: pointer; margin-top: 10px; }
+        
+        /* Resultados */
+        .result-box { margin-top: 20px; padding: 20px; background-color: #003355; color: white; border-radius: 8px; text-align: center; }
+        .result-box h2 { margin: 0; font-size: 16px; font-weight: 400; color: #94a3b8; }
+        .result-box .valor-final { font-size: 32px; font-weight: 900; color: #10B981; margin: 10px 0; }
+        .result-box .walk-away { font-size: 18px; color: #ef4444; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <!-- Ecrã de Bloqueio -->
-    <div id="loginOverlay">
-        <div class="login-box">
-            <h2>Área de Membros</h2>
-            <p>Insira a palavra-passe recebida após a compra na Kiwify.</p>
-            <input type="password" id="passwordInput" placeholder="A sua palavra-passe">
-            <button onclick="checkPassword()">Aceder ao Motor</button>
-            <p id="loginError">Palavra-passe incorreta. Tente novamente.</p>
+    <!-- TELA DE LOGIN -->
+    <div id="login-screen">
+        <h2>Acesso Restrito</h2>
+        <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">Insira a sua palavra-passe da Kiwify para aceder à ferramenta.</p>
+        <input type="password" id="pass-input" placeholder="Palavra-passe de acesso">
+        <br>
+        <button onclick="verificarSenha()">Entrar no Autosales Pro</button>
+        <div id="error-msg">Palavra-passe incorreta. Verifique o seu acesso na Kiwify.</div>
+    </div>
+
+    <!-- APLICAÇÃO PRINCIPAL -->
+    <div id="app-content" class="container" style="display: none;">
+        
+        <!-- 1. NOVA LOGO AUTOSALES PRO -->
+        <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+            <img src="logo.png" alt="Autosales Pro Logo" style="width: 100%; max-width: 350px; height: auto;">
+        </div>
+
+        <!-- 2. BOTÃO DO NOTION -->
+        <div style="text-align: center; margin-bottom: 25px; margin-top: 5px;">
+            <a href="https://melodious-throat-e21.notion.site/To-inspect-3eccfceb1116807ba509f88d4c139d8d" target="_blank" style="background-color: #003355; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-family: inherit; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
+                Abrir Checklist de Inspeção
+            </a>
+        </div>
+
+        <!-- 3. CALCULADORA -->
+        <div class="form-group">
+            <label>Valor da Tabela FIPE (R$)</label>
+            <input type="number" id="fipe" placeholder="Ex: 50000">
+        </div>
+        <div class="form-group">
+            <label>Reparos Mecânicos Estimados (R$)</label>
+            <input type="number" id="mecanica" placeholder="Ex: 1500">
+        </div>
+        <div class="form-group">
+            <label>Estética e Documentação (R$)</label>
+            <input type="number" id="estetica" placeholder="Ex: 800">
+        </div>
+        <div class="form-group">
+            <label>Margem de Lucro Desejada (R$)</label>
+            <input type="number" id="lucro" placeholder="Ex: 5000">
+        </div>
+        
+        <button class="calc-btn" onclick="calcularLucro()">CALCULAR LIMITE DE COMPRA</button>
+
+        <div class="result-box" id="resultado-box" style="display: none;">
+            <h2>OFERTA MÁXIMA RECOMENDADA</h2>
+            <div class="valor-final" id="mao-result">R$ 0,00</div>
+            <div class="walk-away">LIMITE ABSOLUTO: <span id="walk-away-result">R$ 0,00</span></div>
+            <p style="font-size: 12px; color: #94a3b8; margin-top: 15px; margin-bottom: 0;">*Acima deste limite, o seu lucro entra na zona de risco.</p>
         </div>
     </div>
 
-    <!-- Calculadora (Só aparece após login) -->
-    <div class="app-container" id="mainApp">
-        <header>
-            <h1>Motor de Avaliação</h1>
-            <p>Insira os custos para calcular o seu limite de compra.</p>
-        </header>
-        <main>
-            <section class="input-section">
-                <h2>Parâmetros (Editável)</h2>
-                <label>Valor de Revenda Alvo (FIPE + Margem)</label>
-                <input type="number" id="resaleValue" placeholder="Ex: 50000" inputmode="numeric">
-                <label>Margem de Lucro Desejada (%)</label>
-                <input type="number" id="profitMargin" value="30" inputmode="numeric">
-                <label>Recondicionamento Obrigatório (R$)</label>
-                <input type="number" id="reconditioning" placeholder="Estética, óleo, etc." inputmode="numeric">
-                <label>Reparações Descobertas (R$)</label>
-                <input type="number" id="repairs" placeholder="Custos mecânicos" inputmode="numeric">
-                <label>Custos de Manutenção e Logística (R$)</label>
-                <input type="number" id="holdingCosts" placeholder="Taxas, parqueamento" inputmode="numeric">
-            </section>
-            <section class="output-section">
-                <h2>O Seu Limite (Protegido)</h2>
-                <div class="result-card">
-                    <span class="result-label">Oferta Máxima Permitida (MAO)</span>
-                    <span class="result-value" id="maoResult">R$ 0,00</span>
-                </div>
-                <div class="result-card danger">
-                    <span class="result-label">Preço de Desistência ("Walk-Away")</span>
-                    <span class="result-value" id="walkAwayResult">R$ 0,00</span>
-                </div>
-            </section>
-        </main>
-    </div>
-
     <script>
-        // Sistema de Login Simples
-        function checkPassword() {
-            const pwd = document.getElementById('passwordInput').value;
-            const errorMsg = document.getElementById('loginError');
-            
-            // A palavra-passe oficial é KIWIFY2026
-            if (pwd === "KIWIFY2026") {
-                document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('mainApp').style.display = 'block';
+        // Sistema de Proteção por Senha
+        function verificarSenha() {
+            var senha = document.getElementById("pass-input").value;
+            if (senha === "KIWIFY2026") {
+                document.getElementById("login-screen").style.display = "none";
+                document.getElementById("app-content").style.display = "block";
             } else {
-                errorMsg.style.display = 'block';
+                document.getElementById("error-msg").style.display = "block";
             }
         }
 
-        // Motor de Cálculo
-        document.addEventListener('DOMContentLoaded', () => {
-            const inputs = document.querySelectorAll('.input-section input');
-            const maoResult = document.getElementById('maoResult');
-            const walkAwayResult = document.getElementById('walkAwayResult');
+        // Lógica de Cálculo da Ferramenta
+        function calcularLucro() {
+            var fipe = parseFloat(document.getElementById('fipe').value) || 0;
+            var mecanica = parseFloat(document.getElementById('mecanica').value) || 0;
+            var estetica = parseFloat(document.getElementById('estetica').value) || 0;
+            var lucro = parseFloat(document.getElementById('lucro').value) || 0;
 
-            function calculateValuation() {
-                const resale = parseFloat(document.getElementById('resaleValue').value) || 0;
-                const marginPct = parseFloat(document.getElementById('profitMargin').value) || 0;
-                const reconditioning = parseFloat(document.getElementById('reconditioning').value) || 0;
-                const repairs = parseFloat(document.getElementById('repairs').value) || 0;
-                const holding = parseFloat(document.getElementById('holdingCosts').value) || 0;
+            var valorVendaEstimado = fipe * 0.90; 
+            var mao = valorVendaEstimado - mecanica - estetica - lucro;
+            var walkAway = valorVendaEstimado - mecanica - estetica - (lucro * 0.5);
 
-                const marginValue = resale * (marginPct / 100);
-                const mao = resale - marginValue - reconditioning - repairs - holding;
-
-                const formatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
-                const displayValue = mao > 0 ? formatter.format(mao) : formatter.format(0);
-
-                maoResult.textContent = displayValue;
-                walkAwayResult.textContent = displayValue;
-            }
-
-            inputs.forEach(input => { input.addEventListener('input', calculateValuation); });
-        });
+            document.getElementById('mao-result').innerText = mao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            document.getElementById('walk-away-result').innerText = walkAway.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            document.getElementById('resultado-box').style.display = 'block';
+        }
     </script>
 </body>
 </html>
